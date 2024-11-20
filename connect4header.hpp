@@ -6,8 +6,9 @@
 class player{
     public:
     std::string name;
-    std::string token;
+    std::string game_piece;
     int wins = 0;
+    
     void print_won(){
         std::cout << "Player :" << name << " won!" << std::endl;
     }
