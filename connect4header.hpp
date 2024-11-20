@@ -16,3 +16,28 @@ class player{
         std::cout << "Player :" << name << " has " << wins << " wins" << std::endl;
     }
 };
+
+
+/*
+methods can be
+---printing_board---
+---check_win---
+??
+class board{
+};
+
+
+methods can be 
+---rematch---
+clears 
+1 player names
+2 tokens
+3 board
+4 wins
+---new match---
+clears board
+lets winner go first 
+
+class gamestate{
+};
+*/
