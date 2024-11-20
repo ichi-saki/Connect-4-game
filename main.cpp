@@ -5,7 +5,7 @@
 //#include <cstdlib> //used for clearing the terminal
 
 void print_board (int column, int row, std::string **board);
-bool check_win(int column, int row, std::string **board, std::string player1_token, std::string player2_token);
+bool check_win(int column, int row, std::string **board);
 
 //global objects for player 1 & 2
 player player1; 
@@ -17,13 +17,13 @@ int main() {
     //Self explanatory variables. decidedes how many rows and columns the board will have. 
     //allocate space for 2D array
     std::string **board = new std::string*[row];
-    for (int i = 0; i < row; i++) {         //fill board with "white space" or "blank spaces";
+    for (int i = 0; i < row; i++) {         
      board[i] = new std::string[column];
     }
 
     for(int i = 0; i < row; i++){
       for(int j = 0; j < column; j++){
-        board[i][j] = " - ";
+        board[i][j] = "-";
       }
     }
     print_board(column, row, board);
@@ -34,8 +34,22 @@ int main() {
     std::string token;  //string that determines which token will be used
 
     //ask for player input for tokens here instead
-    std::string Token_One = " X ";  //player one token, " X " is a place holder for now
-    std::string Token_Two = " O ";  //same as above, but for player 2 and also a place holder;
+    std::cout << "Player (player1.name) enter game piece: ";
+    std::cin >> player1.game_piece;
+    while(player1.game_piece.length() > 1){
+      std::cout << "Invalid game piece. Please enter valid game piece: ";
+      std::cin >> player1.game_piece;
+    }
+    std::cout << "Player (player2.name) enter game piece: ";
+    std::cin >> player2.game_piece;
+    while(player2.game_piece.length() > 1){
+      std::cout << "Invalid game piece. Please enter valid game piece: ";
+      std::cin >> player1.game_piece;
+    }
+
+
+  //    std::string Token_One = " X ";  //player one token, " X " is a place holder for now
+  //  std::string Token_Two = " O ";  //same as above, but for player 2 and also a place holder;
 
 
     while (swap_counter != row * column) { //when swap counter is equal to the number of rows and columns, the game is over since there are no more tokens at play
@@ -51,22 +65,22 @@ int main() {
         //system("cls"); //clears the terminal to display key info (board, text, etc.)
 
         if (swap_counter % 2 == 0){  //since there is only two players,
-          token = Token_One;         //we can use % to alternate between
+          token = player1.game_piece;         //we can use % to alternate between
         } else {                     //player 1 and player 2 tokens
-          token = Token_Two;
+          token = player2.game_piece;
         }
         
-        if(board[0][column_number - 1] == Token_One || board[0][column_number - 1] == Token_Two) { //logic to make sure the player the token can be placed in a valid spot
+        if(board[0][column_number - 1] == player1.game_piece || board[0][column_number - 1] == player2.game_piece) { //logic to make sure the player the token can be placed in a valid spot
 
           std::cout << "Column " << column_number << " is full. Please Select a different column \n"; //ensures player can't replace top value
           swap_counter--;
         } else {
-          while(board[row_counter][column_number - 1] != Token_One || board[row_counter][column_number - 1] != Token_Two){
+          while(board[row_counter][column_number - 1] != player1.game_piece || board[row_counter][column_number - 1] != player1.game_piece){
           if(row_counter == row_minus_one) { //ensure the while loop does not run forever by placing the last token at the bottom of the row;
             board[row - 1][column_number - 1] = token;
             break;
           } else {
-            if(board[row_counter + 1][column_number -1] == Token_One || board[row_counter + 1][column_number - 1] == Token_Two){ //checks one space below
+            if(board[row_counter + 1][column_number -1] == player1.game_piece || board[row_counter + 1][column_number - 1] == player2.game_piece){ //checks one space below
             board[row_counter][column_number - 1] = token; //places token on top the token below it.
             break;
             }
@@ -75,9 +89,13 @@ int main() {
           }
       }
 
-  
+
   print_board(column, row, board);
-  
+  if(true == check_win(column, row, board)){
+    std::cout << "Win detected\n";
+    return 0;
+  }
+
   swap_counter++;
   std::cout << "There are " << (row * column) - swap_counter << " tokens left\n";
   }
@@ -93,7 +111,7 @@ int main() {
 void print_board (int column, int row, std::string **board){
   for (int i = 0; i < row; i++) {          //print board
         for (int j = 0; j < column; j++) { 
-            std::cout << board[i][j]; 
+            std::cout << " " << board[i][j] << " "; 
         }
         std::cout << "\n"; 
         int column_num = 1;
@@ -102,19 +120,22 @@ void print_board (int column, int row, std::string **board){
           std::cout << " " << column_num << " ";
           column_num++;
         }
-        std::cout << "\n";
+        std::cout << " : Column"<< "\n";
       }
   }
   return;
 }
 
-bool check_win(int column, int row, std::string **board, std::string player1_token, std::string player2_token){
+bool check_win(int column, int row, std::string **board){
   int matches = 0;
-  std::string winning_token = " ";
+  std::string winning_token = "*";
   //check rows 
   for(int i = row - 1; i >= 0; i--){ //check from bottom up
+    if(3 == matches){
+      break;
+    }
     for(int j = 0; j < column; j++){  //check row from left to right
-      if(board[i][j] == board[i][j+1]){  //checking pairs adjecent
+      if(board[i][j] == board[i][j+1] && board[i][j] != "-"){  //checking pairs adjecent
         matches += 1;
         if(matches == 3){  // need to match 3 pairs to see four in a row
         winning_token = board[i][j+1]; //assign winning_token to last token checked
@@ -127,24 +148,43 @@ bool check_win(int column, int row, std::string **board, std::string player1_tok
     }
   }
   //check comulmns
-  //code
+  
+  if(matches != 3){
+    matches = 0;
+    for(int i = 0; i < column; i++){
+      if(3 == matches){
+        break;
+      }
+      for(int j = row - 1; j > 0; j--){
+        if(board[j][i] == board[j-1][i] && board[j][i] != "-"){
+          matches += 1;
+          if(matches == 3){
+            winning_token = board[j-1][i];
+            break;
+          }
+        }
+        else{
+          matches = 0;
+        }
+      }
+    }
+  }
 
   //check diagnol
   //code
 
   //if after row, column and diagnol checks if token winning token still empty return false
-  if(winning_token == " "){
+  if(winning_token == "*"){
     return false;  
   }
   else{ // check which player won and print winning statement
-    if(winning_token == player1_token){
+    if(winning_token == player1.game_piece){
       player1.print_won();
     }
     else{
       player2.print_won();
     }
-
     return true; //return true
-
   }
+
 }
