@@ -97,12 +97,12 @@ int main() {
 
 
   print_board(column, row, board);
-  if(false == check_win(column, row, board) && true == check_draw(column, row, board)){
-    std::cout << "Draw!\n";
+  if(true == check_win(column, row, board)){
+    std::cout << "Win detected\n";
     return 0;
   }
-  else if(true == check_win(column, row, board)){
-    std::cout << "Win detected\n";
+  if(true == check_draw(column, row, board)){
+    std::cout << "Draw detected\n";
     return 0;
   }
 
