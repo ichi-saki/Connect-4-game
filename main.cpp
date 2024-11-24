@@ -6,12 +6,16 @@
 
 void print_board (int column, int row, std::string **board);
 bool check_win(int column, int row, std::string **board);
+bool check_draw(int column, int row, std::string **board);
 
 //global objects for player 1 & 2
 player player1; 
 player player2; 
 
 int main() {
+  player1.name = "player1";
+  player2.name = "player2";
+
   int column = 7;
   int row = 6;
     //Self explanatory variables. decidedes how many rows and columns the board will have. 
@@ -93,7 +97,11 @@ int main() {
 
 
   print_board(column, row, board);
-  if(true == check_win(column, row, board)){
+  if(false == check_win(column, row, board) && true == check_draw(column, row, board)){
+    std::cout << "Draw!\n";
+    return 0;
+  }
+  else if(true == check_win(column, row, board)){
     std::cout << "Win detected\n";
     return 0;
   }
@@ -126,6 +134,17 @@ void print_board (int column, int row, std::string **board){
       }
   }
   return;
+}
+
+bool check_draw(int column, int row, std::string **board){
+  for(int i = 0; i < column; i++){
+    if(board[0][i] == "-"){
+    return false;
+    }
+  }
+  
+  return true;
+
 }
 
 bool check_win(int column, int row, std::string **board){
@@ -228,12 +247,13 @@ bool check_win(int column, int row, std::string **board){
     if(winning_token == player1.game_piece){
       player1.print_won();
       player1.wins += 1;
+      return true;
     }
     else{
       player2.print_won();
       player2.wins += 1;
+      return true;
     }
-    return true; //return true
   }
 
 }
