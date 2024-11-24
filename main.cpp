@@ -26,7 +26,6 @@ int main() {
         board[i][j] = "-";
       }
     }
-    print_board(column, row, board);
     
     int swap_counter = 0; //counter that counts how many tokens have been places. currently used to end the game, but will 
     //determine ties in the future
@@ -42,11 +41,12 @@ int main() {
     }
     std::cout << "Player (player2.name) enter game piece: ";
     std::cin >> player2.game_piece;
-    while(player2.game_piece.length() > 1){
-      std::cout << "Invalid game piece. Please enter valid game piece: ";
+    while(player2.game_piece.length() > 1 || (player2.game_piece == player1.game_piece)){
+      std::cout << "Invalid game piece Or same game piece as player 1. Please enter valid game piece: ";
       std::cin >> player1.game_piece;
     }
 
+  print_board(column, row, board);
 
   //    std::string Token_One = " X ";  //player one token, " X " is a place holder for now
   //  std::string Token_Two = " O ";  //same as above, but for player 2 and also a place holder;
@@ -57,7 +57,9 @@ int main() {
       int row_counter = 0; //used to naviate through the rows
       std::cout << "Enter a valid column number \n";
       std::cin >> column_number;
-        while(column_number > column || column_number < 0){  //ensure that the player can't pick a column that doesn't exist. forces them to pick a column;
+        while(column_number > column || column_number < 0 || true == std::cin.fail()){  //ensure that the player can't pick a column that doesn't exist. forces them to pick a column;
+          std::cin.clear();
+          std::cin.ignore(256,'\n');
           std::cout << "Invalid Number. Please enter a valid column number \n";
           std::cin >> column_number;
         }
@@ -128,7 +130,7 @@ void print_board (int column, int row, std::string **board){
 
 bool check_win(int column, int row, std::string **board){
   int matches = 0;
-  std::string winning_token = "*";
+  std::string winning_token = "";
   //check rows 
   for(int i = row - 1; i >= 0; i--){ //check from bottom up
     if(3 == matches){
@@ -171,18 +173,65 @@ bool check_win(int column, int row, std::string **board){
   }
 
   //check diagnol
-  //code
+  // Diagonal win condition. Top left to bottom right. We check the next three tokens in the row and the next three rows to see if there is a diagonal win.
+    if(matches != 3){
+      matches = 0;
+      for(int i = 0; i < column - 3; ++i)
+      {
+        if(matches == 3){
+          break;
+        }
+        for(int j = 0; j < row - 3; ++j)
+        {
+          if (board[j][i] != "-" &&
+          board[j][i] == board[j+1][i+1] && 
+          board[j + 1][i + 1] == board[j+2][j+2] && 
+          board[j + 2][i + 2] == board[j+3][j+3])
+          {
+             matches = 3;
+             winning_token = board[j][i];
+             break;
+          }
+        }
+      }
+    }
+
+    // Diagonal win condition. bottom left to top right. We check the next three tokens in the row and the previous three rows to see if there is a diagonal win.
+    if(matches != 3){
+      matches = 0;
+      for(int i = 0; i < column - 3; ++i)
+      {
+        if(matches == 3){
+          break;
+        }
+        for(int j = 3; j < row; ++j)
+        {
+          if (board[j][i] != "-" &&
+          board[j][i] == board[j-1][i+1] && 
+          board[j - 1][i + 1] == board[j-2][i+2] && 
+          board[j - 2][i + 2] == board[j-3][i+3])
+          {
+            matches = 3;
+             winning_token = board[j][i];
+             break;
+          }
+        }
+      }
+    }
+    
 
   //if after row, column and diagnol checks if token winning token still empty return false
-  if(winning_token == "*"){
+  if(winning_token == ""){
     return false;  
   }
   else{ // check which player won and print winning statement
     if(winning_token == player1.game_piece){
       player1.print_won();
+      player1.wins += 1;
     }
     else{
       player2.print_won();
+      player2.wins += 1;
     }
     return true; //return true
   }
